@@ -192,7 +192,7 @@ export default function Header() {
           <div className="nav-item">
             <p><Link href="/shop">SHOP</Link></p>
           </div>
-          <div className="nav-item">
+          {/* <div className="nav-item">
             <p><Link href="/locations">LOCATIONS</Link></p>
           </div>
           <div className="nav-item">
@@ -200,12 +200,15 @@ export default function Header() {
           </div>
           <div className="nav-item">
             <p><Link href="/subscriptions">SUBSCRIPTIONS</Link></p>
-          </div>
+          </div> */}
           <div className="nav-item">
             <p><Link href="/faq">FAQ</Link></p>
           </div>
           <div className="nav-item">
             <p><Link href="/about">ABOUT US</Link></p>
+          </div>
+          <div className="nav-item">
+            <p><Link href="/contact">CONTACT</Link></p>
           </div>
         </div>
         <div className="nav-footer">
