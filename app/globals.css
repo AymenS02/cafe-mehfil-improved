@@ -1,0 +1,366 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: hsl(105, 67%, 15%);
+  --color-secondary: hsl(28, 56%, 32%);
+  --color-accent: hsl(120, 19%, 17%);
+  --color-accent1: hsl(32, 81%, 56%);
+  --color-accent2: hsl(45, 78%, 68%);    /* warm golden yellow */
+  --color-accent3: hsl(15, 65%, 45%);     /* burnt sienna/rust */
+  --color-accent4: hsl(85, 45%, 35%);     /* olive/moss green */
+  --color-bg: hsl(30, 17%, 91%);
+  --color-fg: hsl(30, 17%, 10%);
+  
+  --font-rader: "rader", sans-serif;
+  --font-formula: "formula", sans-serif;
+  --font-supply-mono: "supply-mono", monospace;
+  
+}
+
+:root {
+  --primary: hsl(105, 67%, 15%);
+  --secondary: hsl(200, 70%, 50%);
+  --accent: hsl(32, 81%, 56%);
+  --accent1: hsl(105, 67%, 15%);
+  --accent2: hsl(200, 70%, 50%);
+  --accent3: hsl(300, 60%, 50%);
+  --accent4: hsl(150, 60%, 40%);
+  --bg: hsl(30, 17%, 91%);
+  --bg2: hsl(30, 17%, 85%);
+  --fg: hsl(30, 17%, 10%);
+}
+
+
+body {
+  background-image: url('/images/global/background.png');
+}
+h1,
+h2,
+h3 {
+  text-transform: uppercase;
+  font-family: "rader";
+  font-style: italic;
+  line-height: 0.95;
+}
+
+p,
+p.ss {
+  font-family: "formula-narrow";
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.125;
+}
+
+p.mn {
+  text-transform: uppercase;
+  font-family: "supply-mono";
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.125;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-Thin.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-ThinItalic.ttf") format("truetype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-Hairline.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "rader";
+  src: url("/fonts/rader/PPRader-HairlineItalic.ttf") format("truetype");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-condensed";
+  src: url("/fonts/formula/PPFormula-CondensedBlack.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-condensed";
+  src: url("/fonts/formula/PPFormula-CondensedLight.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-condensed";
+  src: url("/fonts/formula/PPFormula-CondensedItalic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-condensed";
+  src: url("/fonts/formula/PPFormula-CondensedRegular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-extended";
+  src: url("/fonts/formula/PPFormula-ExtendedBold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-extended";
+  src: url("/fonts/formula/PPFormula-ExtendedLight.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-extended";
+  src: url("/fonts/formula/PPFormula-ExtendedItalic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-extended";
+  src: url("/fonts/formula/PPFormula-ExtendedMedium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula";
+  src: url("/fonts/formula/PPFormula-Extrabold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula";
+  src: url("/fonts/formula/PPFormula-ExtraboldItalic.ttf") format("truetype");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula";
+  src: url("/fonts/formula/PPFormula-Light.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula";
+  src: url("/fonts/formula/PPFormula-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula";
+  src: url("/fonts/formula/PPFormula-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-narrow";
+  src: url("/fonts/formula/PPFormula-NarrowBold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-narrow";
+  src: url("/fonts/formula/PPFormula-NarrowBoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-narrow";
+  src: url("/fonts/formula/PPFormula-NarrowRegular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-narrow";
+  src: url("/fonts/formula/PPFormula-NarrowSemibold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula";
+  src: url("/fonts/formula/PPFormula-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula";
+  src: url("/fonts/formula/PPFormula-RegularItalic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-semicondensed";
+  src: url("/fonts/formula/PPFormula-SemiCondensedLight.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-semicondensed";
+  src: url("/fonts/formula/PPFormula-SemiCondensedItalic.ttf")
+    format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-semicondensed";
+  src: url("/fonts/formula/PPFormula-SemiCondensedMedium.ttf")
+    format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-semicondensed";
+  src: url("/fonts/formula/PPFormula-SemiCondensedThin.ttf") format("truetype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "formula-semiextended";
+  src: url("/fonts/formula/PPFormula-SemiExtendedBold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "supply-mono";
+  src: url("/fonts/supply-mono/PPSupplyMono-Bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "supply-mono";
+  src: url("/fonts/supply-mono/PPSupplyMono-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "supply-mono";
+  src: url("/fonts/supply-mono/PPSupplyMono-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "supply-mono";
+  src: url("/fonts/supply-mono/PPSupplyMono-Ultralight.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
