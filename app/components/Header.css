@@ -14,7 +14,7 @@ nav {
 .close-label {
   /* z-index on static elements doesn't apply; if you need it keep it positioned */
   position: relative;
-  z-index: 2;
+  z-index: 50;
 }
 nav .logo {
   padding: 0.5em 0.65em;
@@ -73,7 +73,7 @@ nav .menu-toggle-btn-wrapper {
   overflow: hidden;
   pointer-events: none;
   opacity: 0;
-  z-index: 10; /* keep overlay below nav (nav is 100) */
+  z-index: 50; /* keep overlay below nav (nav is 100) */
 }
 
 /* rest unchanged... */
