@@ -77,10 +77,14 @@ function calcCateringQuote(input) {
     const distanceOneWayKm = Number(input.distanceOneWayKm || 0);
     const gasPricePerLitre = Number(input.gasPricePerLitre || 0);
     const vehicleKmPerLitre = Number(input.vehicleKmPerLitre || 1);
-    const roundTripKm = distanceOneWayKm * 2;
-    const litresUsed = roundTripKm / vehicleKmPerLitre;
-    const fuelCost = litresUsed * gasPricePerLitre;
-    deliveryFee = roundUpToStep(fuelCost, CFG.delivery.roundStep);
+    
+    // Validate to prevent division by zero
+    if (vehicleKmPerLitre > 0 && distanceOneWayKm > 0 && gasPricePerLitre >= 0) {
+      const roundTripKm = distanceOneWayKm * 2;
+      const litresUsed = roundTripKm / vehicleKmPerLitre;
+      const fuelCost = litresUsed * gasPricePerLitre;
+      deliveryFee = roundUpToStep(fuelCost, CFG.delivery.roundStep);
+    }
   }
 
   const total = roundUpCents(drinkSubtotal + iceTotal + cupsAddonTotal + deliveryFee);
