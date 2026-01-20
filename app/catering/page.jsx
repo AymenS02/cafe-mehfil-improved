@@ -182,7 +182,7 @@ export default function CateringPage() {
             Catering Quote Calculator
           </h1>
           <p className="text-xl text-accent2 max-w-2xl mx-auto">
-            Get a transparent, instant quote for your event. Configure your order and see exactly what you'll pay.
+            Get a transparent, instant quote for your event. Configure your order and see exactly what you&apos;ll pay.
           </p>
         </div>
       </section>
