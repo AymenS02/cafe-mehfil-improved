@@ -27,7 +27,7 @@ export const createOrder = (userId, userName, userEmail, items, paymentMethod, t
   const orders = getOrders();
   
   const newOrder = {
-    id: Date.now().toString(),
+    id: crypto.randomUUID(),
     userId,
     userName,
     userEmail,

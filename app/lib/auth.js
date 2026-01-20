@@ -64,7 +64,7 @@ export const signup = (email, password, name) => {
   }
   
   const newUser = {
-    id: Date.now().toString(),
+    id: crypto.randomUUID(),
     email,
     password,
     name,
@@ -97,7 +97,7 @@ export const createUser = (email, password, name, role = 'user') => {
   }
   
   const newUser = {
-    id: Date.now().toString(),
+    id: crypto.randomUUID(),
     email,
     password,
     name,
