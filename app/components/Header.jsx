@@ -192,6 +192,9 @@ export default function Header() {
           <div className="nav-item">
             <p><Link href="/shop">SHOP</Link></p>
           </div>
+          <div className="nav-item">
+            <p><Link href="/catering">CATERING</Link></p>
+          </div>
           {/* <div className="nav-item">
             <p><Link href="/locations">LOCATIONS</Link></p>
           </div>
