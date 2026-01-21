@@ -3,14 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
-import { ShoppingCart, Filter, Search, Package, Droplet, Wrench, Coffee } from "lucide-react";
+import { ShoppingCart, Filter, Search, Package, Droplet, Wrench, Coffee, Check } from "lucide-react";
+import { useCart } from "../contexts/CartContext";
 
 export default function ShopPage() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [addedToCart, setAddedToCart] = useState(null);
   const heroRef = useRef(null);
   const productsRef = useRef(null);
   const productCardRefs = useRef([]);
+  const { addToCart } = useCart();
 
   const categories = [
     { id: "all", label: "All Products", icon: Package },
@@ -184,6 +187,16 @@ export default function ShopPage() {
     }
   };
 
+  const handleAddToCart = (product) => {
+    addToCart(product, 1);
+    setAddedToCart(product.id);
+    
+    // Reset the added state after 2 seconds
+    setTimeout(() => {
+      setAddedToCart(null);
+    }, 2000);
+  };
+
   return (
     <div className="min-h-screen ">
       {/* Hero Section */}
@@ -284,14 +297,26 @@ export default function ShopPage() {
                     </span>
                     <button
                       disabled={!product.inStock}
+                      onClick={() => handleAddToCart(product)}
                       className={`add-to-cart-btn flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm transition ${
                         product.inStock
-                          ? "bg-primary text-bg hover:bg-accent shadow-md hover:shadow-lg"
+                          ? addedToCart === product.id
+                            ? 'bg-green-600 text-white'
+                            : 'bg-primary text-bg hover:bg-accent shadow-md hover:shadow-lg'
                           : "bg-bg text-secondary/40 cursor-not-allowed border border-secondary/20"
                       }`}
                     >
-                      <ShoppingCart className="w-4 h-4" />
-                      {product.inStock ? "Add to Cart" : "Unavailable"}
+                      {addedToCart === product.id ? (
+                        <>
+                          <Check className="w-4 h-4" />
+                          Added!
+                        </>
+                      ) : (
+                        <>
+                          <ShoppingCart className="w-4 h-4" />
+                          {product.inStock ? "Add to Cart" : "Unavailable"}
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
