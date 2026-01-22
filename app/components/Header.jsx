@@ -201,7 +201,7 @@ export default function Header() {
         </div>
         <div className="flex items-center gap-4">
           {/* Cart Icon */}
-          <Link href="/cart" className="relative p-2 hover:opacity-70 transition-opacity">
+          <Link href="/cart" className="bg-bg2 rounded-lg shadow-md relative p-2 hover:opacity-70 transition-opacity">
             <ShoppingCart className="w-6 h-6 text-primary" />
             {cartItemCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
@@ -210,7 +210,7 @@ export default function Header() {
             )}
           </Link>
           {/* User Icon */}
-          <Link href={isAuthenticated ? "/account" : "/login"} className="p-2 hover:opacity-70 transition-opacity">
+          <Link href={isAuthenticated ? "/account" : "/login"} className="bg-bg2 rounded-md shadow-lg p-2 hover:opacity-70 transition-opacity">
             <User className="w-6 h-6 text-primary" />
           </Link>
           {/* Mobile menu toggle button - hidden on desktop */}
@@ -223,7 +223,7 @@ export default function Header() {
         </div>
 
         {/* Desktop navigation - visible on larger screens */}
-        <div className="desktop-nav">
+        <div className="desktop-nav bg-bg2 rounded-lg shadow-md desktop-flex">
           <div className="desktop-nav-item">
             <p className="mn"><Link href="/">HOME</Link></p>
           </div>
