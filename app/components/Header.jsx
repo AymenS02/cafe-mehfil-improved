@@ -9,6 +9,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { ShoppingCart, User } from 'lucide-react';
 
+// Mobile breakpoint constant
+const MOBILE_BREAKPOINT = 1000;
+
+// Helper function to check if current view is mobile
+const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
+
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
   const { getCartItemCount } = useCart();
@@ -17,9 +23,7 @@ export default function Header() {
   // Removed the useEffect that force-set navOverlay z-index
 
   useEffect(() => {
-    // Only enable animations on mobile (max-width: 1000px)
-    const isMobile = () => window.innerWidth <= 1000;
-    
+    // Only enable animations on mobile
     const menuToggleBtn = document.querySelector(".menu-toggle-btn");
     const navOverlay = document.querySelector(".nav-overlay");
     const openLabel = document.querySelector(".open-label");
@@ -122,7 +126,6 @@ export default function Header() {
 
   // Close the menu when clicking any internal link inside the overlay
   useEffect(() => {
-    const isMobile = () => window.innerWidth <= 1000;
     const navOverlay = document.querySelector(".nav-overlay");
     if (!navOverlay) return;
 
@@ -169,7 +172,6 @@ export default function Header() {
   // Also ensure the menu is closed whenever the route changes
   const pathname = usePathname();
   useEffect(() => {
-    const isMobile = () => window.innerWidth <= 1000;
     // Only handle route changes on mobile
     if (!isMobile()) return;
     
