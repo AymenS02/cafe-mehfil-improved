@@ -11,6 +11,57 @@ nav {
   overflow-x: hidden;
   z-index: 100;
 }
+
+/* Desktop navigation - visible only on larger screens */
+.desktop-nav {
+  display: none;
+}
+
+@media (min-width: 1001px) {
+  .desktop-nav {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+  }
+
+  .desktop-nav-item {
+    padding: 0.6em 0.65em;
+    background-color: var(--bg2);
+    color: var(--fg);
+    border-radius: 0.4em;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  .desktop-nav-item:hover {
+    background-color: var(--fg);
+  }
+
+  .desktop-nav-item:hover p a {
+    color: var(--bg);
+  }
+
+  .desktop-nav-item p {
+    user-select: none;
+  }
+
+  /* Hide mobile menu toggle on desktop */
+  .desktop-hidden {
+    display: none !important;
+  }
+
+  /* Hide mobile overlay on desktop */
+  .nav-overlay {
+    display: none !important;
+  }
+}
+
+/* Mobile menu toggle button - visible only on mobile */
+@media (max-width: 1000px) {
+  .desktop-nav {
+    display: none !important;
+  }
+}
 .close-label {
   /* z-index on static elements doesn't apply; if you need it keep it positioned */
   position: relative;
