@@ -9,6 +9,7 @@
   --color-accent3: hsl(15, 65%, 45%);     /* burnt sienna/rust */
   --color-accent4: hsl(85, 45%, 35%);     /* olive/moss green */
   --color-bg: hsl(30, 17%, 91%);
+  --color-bg2: hsl(30, 17%, 85%);
   --color-fg: hsl(30, 17%, 10%);
   
   --font-rader: "rader", sans-serif;

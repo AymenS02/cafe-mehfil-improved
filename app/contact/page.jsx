@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { Mail, Phone, MapPin, Clock, Send, Coffee, Building2, Users, Package, MessageSquare, Calendar } from "lucide-react";
 
+const WEB3FORMS_KEY = "a305236b-9653-4090-b21c-ec086de8cf47";
+
 export default function ContactPage() {
   const [formData, setFormData] = useState({
     name: "",
@@ -110,13 +112,32 @@ export default function ContactPage() {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setSubmitStatus(null);
+
+  try {
+    const response = await fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      body: JSON.stringify({
+        access_key: WEB3FORMS_KEY,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        subject: formData.subject,
+        category: formData.category,
+        message: formData.message,
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
       setSubmitStatus("success");
       setFormData({
         name: "",
@@ -124,13 +145,20 @@ export default function ContactPage() {
         phone: "",
         subject: "",
         category: "",
-        message: ""
+        message: "",
       });
-      
-      // Reset status after 5 seconds
-      setTimeout(() => setSubmitStatus(null), 5000);
-    }, 1500);
-  };
+    } else {
+      setSubmitStatus("error");
+    }
+  } catch (error) {
+    console.error(error);
+    setSubmitStatus("error");
+  } finally {
+    setIsSubmitting(false);
+    setTimeout(() => setSubmitStatus(null), 5000);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-bg">
@@ -328,13 +356,14 @@ export default function ContactPage() {
                 </button>
 
                 {/* Success Message */}
-                {submitStatus === "success" && (
-                  <div className="p-4 bg-accent4/20 border border-accent4 rounded-lg">
-                    <p className="text-accent4 font-medium text-center">
-                      ✓ Message sent successfully! We'll get back to you soon.
+                {submitStatus === "error" && (
+                  <div className="p-4 bg-red-100 border border-red-400 rounded-lg">
+                    <p className="text-red-700 font-medium text-center">
+                      ✕ Something went wrong. Please try again.
                     </p>
                   </div>
                 )}
+
               </form>
             </div>
           </div>

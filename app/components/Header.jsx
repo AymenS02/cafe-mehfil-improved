@@ -176,18 +176,37 @@ export default function Header() {
             <p className="mn"><Link href="/">Cafe ✦ Mehfil</Link></p>
           </div>
         </div>
-        <div className="menu-toggle-btn">
+        <div className="menu-toggle-btn md:hidden">
           <div className="menu-toggle-btn-wrapper">
             <p className="mn open-label">Menu</p>
             <p className="mn close-label">Close</p>
           </div>
+        </div>
+
+        <div className="z-200 overflow-visible relative p-2 bg-bg2 flex gap-2 max-md:hidden">
+          <div className="menu-toggle-btn-wrapper">
+            <p className="mn"><Link href="/">HOME</Link></p>
+          </div>
+          <div className="menu-toggle-btn-wrapper">
+            <p className="mn"><Link href="/shop">SHOP</Link></p>
+          </div>
+          <div className="menu-toggle-btn-wrapper">
+            <p className="mn"><Link href="/faq">FAQ</Link></p>
+          </div>
+          <div className="menu-toggle-btn-wrapper">
+            <p className="mn"><Link href="/about">ABOUT US</Link></p>
+          </div>
+          <div className="menu-toggle-btn-wrapper">
+            <p className="mn"><Link href="/contact">CONTACT</Link></p>
+          </div>
+
         </div>
       </nav>
 
       <div className="nav-overlay">
         <div className="nav-items">
           <div className="nav-item active">
-            <p><Link href="/">Index</Link></p>
+            <p><Link href="/">HOME</Link></p>
           </div>
           <div className="nav-item">
             <p><Link href="/shop">SHOP</Link></p>

@@ -163,6 +163,7 @@ export default function Home() {
             <Image
               width={75}
               height={75}
+              className="w-auto"
               src="/images/global/symbols.png"
               alt=""
             />
