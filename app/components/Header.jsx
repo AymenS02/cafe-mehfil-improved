@@ -9,6 +9,12 @@ import { useAuth } from '../contexts/AuthContext';
 import { useCart } from '../contexts/CartContext';
 import { ShoppingCart, User } from 'lucide-react';
 
+// Mobile breakpoint constant
+const MOBILE_BREAKPOINT = 1000;
+
+// Helper function to check if current view is mobile
+const isMobile = () => typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT;
+
 export default function Header() {
   const { user, isAuthenticated } = useAuth();
   const { getCartItemCount } = useCart();
@@ -17,6 +23,7 @@ export default function Header() {
   // Removed the useEffect that force-set navOverlay z-index
 
   useEffect(() => {
+    // Only enable animations on mobile
     const menuToggleBtn = document.querySelector(".menu-toggle-btn");
     const navOverlay = document.querySelector(".nav-overlay");
     const openLabel = document.querySelector(".open-label");
@@ -27,6 +34,9 @@ export default function Header() {
     let scrollY = 0;
 
     const handleClick = () => {
+      // Only run animations on mobile
+      if (!isMobile()) return;
+      
       if (isAnimating) {
         gsap.killTweensOf([navOverlay, openLabel, closeLabel, navItems]);
         isAnimating = false;
@@ -120,6 +130,9 @@ export default function Header() {
     if (!navOverlay) return;
 
     const onOverlayClick = (e) => {
+      // Only handle clicks on mobile
+      if (!isMobile()) return;
+      
       const anchor = e.target && e.target.closest ? e.target.closest("a") : null;
       if (!anchor) return;
 
@@ -159,6 +172,9 @@ export default function Header() {
   // Also ensure the menu is closed whenever the route changes
   const pathname = usePathname();
   useEffect(() => {
+    // Only handle route changes on mobile
+    if (!isMobile()) return;
+    
     const menuToggleBtn = document.querySelector(".menu-toggle-btn");
     if (menuToggleBtn && menuToggleBtn.classList.contains("menu-open")) {
       try {
@@ -197,7 +213,8 @@ export default function Header() {
           <Link href={isAuthenticated ? "/account" : "/login"} className="p-2 hover:opacity-70 transition-opacity">
             <User className="w-6 h-6 text-primary" />
           </Link>
-          <div className="menu-toggle-btn">
+          {/* Mobile menu toggle button - hidden on desktop */}
+          <div className="menu-toggle-btn desktop-hidden">
             <div className="menu-toggle-btn-wrapper">
               <p className="mn open-label">Menu</p>
               <p className="mn close-label">Close</p>
@@ -205,23 +222,41 @@ export default function Header() {
           </div>
         </div>
 
-        <div className="z-200 overflow-visible relative p-2 bg-bg2 flex gap-2 max-md:hidden">
-          <div className="menu-toggle-btn-wrapper">
+        {/* Desktop navigation - visible on larger screens */}
+        <div className="desktop-nav">
+          <div className="desktop-nav-item">
             <p className="mn"><Link href="/">HOME</Link></p>
           </div>
-          <div className="menu-toggle-btn-wrapper">
+          <div className="desktop-nav-item">
             <p className="mn"><Link href="/shop">SHOP</Link></p>
           </div>
-          <div className="menu-toggle-btn-wrapper">
+          <div className="desktop-nav-item">
+            <p className="mn"><Link href="/catering">CATERING</Link></p>
+          </div>
+          <div className="desktop-nav-item">
             <p className="mn"><Link href="/faq">FAQ</Link></p>
           </div>
-          <div className="menu-toggle-btn-wrapper">
+          <div className="desktop-nav-item">
             <p className="mn"><Link href="/about">ABOUT US</Link></p>
           </div>
-          <div className="menu-toggle-btn-wrapper">
+          <div className="desktop-nav-item">
             <p className="mn"><Link href="/contact">CONTACT</Link></p>
           </div>
-
+          {isAuthenticated && user?.role === 'admin' && (
+            <div className="desktop-nav-item">
+              <p className="mn"><Link href="/admin">ADMIN</Link></p>
+            </div>
+          )}
+          {isAuthenticated && (
+            <div className="desktop-nav-item">
+              <p className="mn"><Link href="/account">MY ACCOUNT</Link></p>
+            </div>
+          )}
+          {!isAuthenticated && (
+            <div className="desktop-nav-item">
+              <p className="mn"><Link href="/login">LOGIN</Link></p>
+            </div>
+          )}
         </div>
       </nav>
 
