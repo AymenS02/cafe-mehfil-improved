@@ -13,7 +13,7 @@ import { ShoppingCart, User } from 'lucide-react';
 const MOBILE_BREAKPOINT = 1000;
 
 // Helper function to check if current view is mobile
-const isMobile = () => window.innerWidth <= MOBILE_BREAKPOINT;
+const isMobile = () => typeof window !== 'undefined' && window.innerWidth <= MOBILE_BREAKPOINT;
 
 export default function Header() {
   const { user, isAuthenticated } = useAuth();

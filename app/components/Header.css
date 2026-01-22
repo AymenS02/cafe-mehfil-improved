@@ -17,7 +17,7 @@ nav {
   display: none;
 }
 
-@media (min-width: 1001px) {
+@media (min-width: 1000px) {
   .desktop-nav {
     display: flex;
     gap: 0.5em;
@@ -57,7 +57,7 @@ nav {
 }
 
 /* Mobile menu toggle button - visible only on mobile */
-@media (max-width: 1000px) {
+@media (max-width: 999px) {
   .desktop-nav {
     display: none !important;
   }
