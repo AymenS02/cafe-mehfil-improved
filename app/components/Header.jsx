@@ -5,8 +5,15 @@ import { usePathname } from 'next/navigation';
 import gsap from 'gsap';
 import './Header.css';
 import Link from 'next/link';
+import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
+import { ShoppingCart, User } from 'lucide-react';
 
 export default function Header() {
+  const { user, isAuthenticated } = useAuth();
+  const { getCartItemCount } = useCart();
+  const cartItemCount = getCartItemCount();
+
   // Removed the useEffect that force-set navOverlay z-index
 
   useEffect(() => {
@@ -176,10 +183,25 @@ export default function Header() {
             <p className="mn"><Link href="/">Cafe ✦ Mehfil</Link></p>
           </div>
         </div>
-        <div className="menu-toggle-btn md:hidden">
-          <div className="menu-toggle-btn-wrapper">
-            <p className="mn open-label">Menu</p>
-            <p className="mn close-label">Close</p>
+        <div className="flex items-center gap-4">
+          {/* Cart Icon */}
+          <Link href="/cart" className="relative p-2 hover:opacity-70 transition-opacity">
+            <ShoppingCart className="w-6 h-6 text-primary" />
+            {cartItemCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-accent text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {cartItemCount}
+              </span>
+            )}
+          </Link>
+          {/* User Icon */}
+          <Link href={isAuthenticated ? "/account" : "/login"} className="p-2 hover:opacity-70 transition-opacity">
+            <User className="w-6 h-6 text-primary" />
+          </Link>
+          <div className="menu-toggle-btn">
+            <div className="menu-toggle-btn-wrapper">
+              <p className="mn open-label">Menu</p>
+              <p className="mn close-label">Close</p>
+            </div>
           </div>
         </div>
 
@@ -211,6 +233,9 @@ export default function Header() {
           <div className="nav-item">
             <p><Link href="/shop">SHOP</Link></p>
           </div>
+          <div className="nav-item">
+            <p><Link href="/catering">CATERING</Link></p>
+          </div>
           {/* <div className="nav-item">
             <p><Link href="/locations">LOCATIONS</Link></p>
           </div>
@@ -229,6 +254,21 @@ export default function Header() {
           <div className="nav-item">
             <p><Link href="/contact">CONTACT</Link></p>
           </div>
+          {isAuthenticated && user?.role === 'admin' && (
+            <div className="nav-item">
+              <p><Link href="/admin">ADMIN</Link></p>
+            </div>
+          )}
+          {isAuthenticated && (
+            <div className="nav-item">
+              <p><Link href="/account">MY ACCOUNT</Link></p>
+            </div>
+          )}
+          {!isAuthenticated && (
+            <div className="nav-item">
+              <p><Link href="/login">LOGIN</Link></p>
+            </div>
+          )}
         </div>
         <div className="nav-footer">
           <div className="nav-footer-item">
