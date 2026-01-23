@@ -6,7 +6,17 @@ import Image from 'next/image';
 import { useAuth } from '../contexts/AuthContext';
 import { getOrders, updateOrderStatus, updatePaymentStatus, getOrderStatusDisplay, getPaymentStatusDisplay } from '../lib/orders';
 import { getUsers, createUser as createUserUtil } from '../lib/auth';
-import { Shield, Users, Package, UserPlus, Check, X, AlertCircle } from 'lucide-react';
+import { 
+  getSubscriptions, 
+  processSubscriptionPayment, 
+  getDueSubscriptions,
+  getUpcomingDueSubscriptions,
+  getFrequencyDisplay,
+  getSubscriptionStatusDisplay,
+  formatDate,
+  isSubscriptionOverdue
+} from '../lib/subscriptions';
+import { Shield, Users, Package, UserPlus, Check, X, AlertCircle, Calendar, Bell } from 'lucide-react';
 
 export default function AdminPage() {
   const router = useRouter();
@@ -14,6 +24,9 @@ export default function AdminPage() {
   const [activeTab, setActiveTab] = useState('orders');
   const [orders, setOrders] = useState([]);
   const [users, setUsers] = useState([]);
+  const [subscriptions, setSubscriptions] = useState([]);
+  const [dueSubscriptions, setDueSubscriptions] = useState([]);
+  const [upcomingDueSubscriptions, setUpcomingDueSubscriptions] = useState([]);
   const [showCreateUser, setShowCreateUser] = useState(false);
   const [newUser, setNewUser] = useState({
     name: '',
@@ -23,6 +36,17 @@ export default function AdminPage() {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  const loadData = () => {
+    const allOrders = getOrders();
+    setOrders(allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    setUsers(getUsers());
+    
+    const allSubscriptions = getSubscriptions();
+    setSubscriptions(allSubscriptions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    setDueSubscriptions(getDueSubscriptions());
+    setUpcomingDueSubscriptions(getUpcomingDueSubscriptions());
+  };
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -37,12 +61,6 @@ export default function AdminPage() {
 
     loadData();
   }, [isAuthenticated, isAdmin, router]);
-
-  const loadData = () => {
-    const allOrders = getOrders();
-    setOrders(allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-    setUsers(getUsers());
-  };
 
   if (!isAuthenticated || !isAdmin) {
     return null;
@@ -80,6 +98,15 @@ export default function AdminPage() {
       setTimeout(() => setSuccess(''), 3000);
     } else {
       setError(result.error);
+    }
+  };
+
+  const handleProcessPayment = (subscriptionId) => {
+    const result = processSubscriptionPayment(subscriptionId);
+    if (result.success) {
+      loadData();
+      setSuccess(`Payment processed for ${result.subscription.userName}'s subscription`);
+      setTimeout(() => setSuccess(''), 3000);
     }
   };
 
@@ -136,6 +163,22 @@ export default function AdminPage() {
           >
             <Package className="w-5 h-5 inline mr-2" />
             Orders ({orders.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('subscriptions')}
+            className={`px-6 py-3 font-semibold transition-colors relative ${
+              activeTab === 'subscriptions'
+                ? 'text-primary border-b-2 border-primary'
+                : 'text-secondary hover:text-fg'
+            }`}
+          >
+            <Calendar className="w-5 h-5 inline mr-2" />
+            Subscriptions ({subscriptions.length})
+            {dueSubscriptions.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {dueSubscriptions.length}
+              </span>
+            )}
           </button>
           <button
             onClick={() => setActiveTab('users')}
@@ -262,6 +305,162 @@ export default function AdminPage() {
                 </div>
               ))
             )}
+          </div>
+        )}
+
+        {/* Subscriptions Tab */}
+        {activeTab === 'subscriptions' && (
+          <div className="space-y-6">
+            {/* Reminders Section */}
+            {(dueSubscriptions.length > 0 || upcomingDueSubscriptions.length > 0) && (
+              <div className="space-y-4">
+                {/* Due Now */}
+                {dueSubscriptions.length > 0 && (
+                  <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Bell className="w-6 h-6 text-red-600" />
+                      <h3 className="text-xl font-bold text-red-900">
+                        Overdue Subscriptions ({dueSubscriptions.length})
+                      </h3>
+                    </div>
+                    <div className="space-y-3">
+                      {dueSubscriptions.map((subscription) => (
+                        <div key={subscription.id} className="bg-white rounded-lg p-4 flex items-center justify-between">
+                          <div>
+                            <p className="font-bold text-fg">{subscription.userName}</p>
+                            <p className="text-sm text-secondary">{subscription.userEmail}</p>
+                            <p className="text-sm text-red-600 font-semibold mt-1">
+                              Due: {formatDate(subscription.nextDueDate)} - ${subscription.amount} ({getFrequencyDisplay(subscription.frequency)})
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleProcessPayment(subscription.id)}
+                            className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+                          >
+                            Process Payment
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Due Soon */}
+                {upcomingDueSubscriptions.length > 0 && (
+                  <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Calendar className="w-6 h-6 text-yellow-600" />
+                      <h3 className="text-xl font-bold text-yellow-900">
+                        Due Within 7 Days ({upcomingDueSubscriptions.length})
+                      </h3>
+                    </div>
+                    <div className="space-y-3">
+                      {upcomingDueSubscriptions.map((subscription) => (
+                        <div key={subscription.id} className="bg-white rounded-lg p-4 flex items-center justify-between">
+                          <div>
+                            <p className="font-bold text-fg">{subscription.userName}</p>
+                            <p className="text-sm text-secondary">{subscription.userEmail}</p>
+                            <p className="text-sm text-yellow-700 font-semibold mt-1">
+                              Due: {formatDate(subscription.nextDueDate)} - ${subscription.amount} ({getFrequencyDisplay(subscription.frequency)})
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => handleProcessPayment(subscription.id)}
+                            className="px-4 py-2 bg-yellow-600 text-white font-semibold rounded-lg hover:bg-yellow-700 transition-colors"
+                          >
+                            Process Early
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* All Subscriptions */}
+            <div>
+              <h3 className="text-xl font-bold text-fg mb-4">All Subscriptions</h3>
+              {subscriptions.length === 0 ? (
+                <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-secondary/10">
+                  <Calendar className="w-16 h-16 text-secondary/40 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-fg mb-2">No Subscriptions Yet</h3>
+                  <p className="text-secondary">Subscriptions will appear here once users start subscribing</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {subscriptions.map((subscription) => {
+                    const overdue = isSubscriptionOverdue(subscription);
+                    return (
+                      <div
+                        key={subscription.id}
+                        className={`bg-white rounded-2xl shadow-lg p-6 border-2 ${
+                          overdue ? 'border-red-300' : 'border-secondary/10'
+                        }`}
+                      >
+                        <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                          <div>
+                            <h3 className="text-xl font-bold text-fg mb-2">{subscription.userName}</h3>
+                            <p className="text-sm text-secondary mb-1">{subscription.userEmail}</p>
+                            <p className="text-sm text-secondary">
+                              Created: {formatDate(subscription.createdAt)}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-2xl font-bold text-primary mb-2">
+                              ${subscription.amount}
+                            </p>
+                            <p className="text-sm text-secondary mb-2">
+                              {getFrequencyDisplay(subscription.frequency)}
+                            </p>
+                            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                              subscription.status === 'active'
+                                ? 'bg-green-100 text-green-800'
+                                : subscription.status === 'paused'
+                                ? 'bg-yellow-100 text-yellow-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}>
+                              {getSubscriptionStatusDisplay(subscription.status)}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-bg rounded-lg">
+                          <div>
+                            <p className="text-sm font-semibold text-fg mb-1">Start Date</p>
+                            <p className="text-sm text-secondary">{formatDate(subscription.startDate)}</p>
+                          </div>
+                          {subscription.status === 'active' && (
+                            <div>
+                              <p className="text-sm font-semibold text-fg mb-1">Next Due</p>
+                              <p className={`text-sm font-semibold ${overdue ? 'text-red-600' : 'text-secondary'}`}>
+                                {formatDate(subscription.nextDueDate)}
+                                {overdue && ' (OVERDUE)'}
+                              </p>
+                            </div>
+                          )}
+                          {subscription.lastPaymentDate && (
+                            <div>
+                              <p className="text-sm font-semibold text-fg mb-1">Last Payment</p>
+                              <p className="text-sm text-secondary">{formatDate(subscription.lastPaymentDate)}</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {subscription.status === 'active' && (
+                          <button
+                            onClick={() => handleProcessPayment(subscription.id)}
+                            className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-accent transition-colors"
+                          >
+                            Process Payment
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         )}
 

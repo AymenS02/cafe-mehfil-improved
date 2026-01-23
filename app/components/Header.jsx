@@ -242,6 +242,11 @@ export default function Header() {
           <div className="desktop-nav-item">
             <p className="mn"><Link href="/contact">CONTACT</Link></p>
           </div>
+          {isAuthenticated && (
+            <div className="desktop-nav-item">
+              <p className="mn"><Link href="/subscriptions">SUBSCRIPTIONS</Link></p>
+            </div>
+          )}
           {isAuthenticated && user?.role === 'admin' && (
             <div className="desktop-nav-item">
               <p className="mn"><Link href="/admin">ADMIN</Link></p>
@@ -271,15 +276,6 @@ export default function Header() {
           <div className="nav-item">
             <p><Link href="/catering">CATERING</Link></p>
           </div>
-          {/* <div className="nav-item">
-            <p><Link href="/locations">LOCATIONS</Link></p>
-          </div>
-          <div className="nav-item">
-            <p><Link href="/business">BUSINESS</Link></p>
-          </div>
-          <div className="nav-item">
-            <p><Link href="/subscriptions">SUBSCRIPTIONS</Link></p>
-          </div> */}
           <div className="nav-item">
             <p><Link href="/faq">FAQ</Link></p>
           </div>
@@ -289,6 +285,11 @@ export default function Header() {
           <div className="nav-item">
             <p><Link href="/contact">CONTACT</Link></p>
           </div>
+          {isAuthenticated && (
+            <div className="nav-item">
+              <p><Link href="/subscriptions">SUBSCRIPTIONS</Link></p>
+            </div>
+          )}
           {isAuthenticated && user?.role === 'admin' && (
             <div className="nav-item">
               <p><Link href="/admin">ADMIN</Link></p>
