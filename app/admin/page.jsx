@@ -105,7 +105,7 @@ export default function AdminPage() {
     const result = processSubscriptionPayment(subscriptionId);
     if (result.success) {
       loadData();
-      setSuccess(`Payment processed for ${result.subscription.userName}'s subscription`);
+      setSuccess(`Delivery processed for ${result.subscription.userName}'s coffee subscription`);
       setTimeout(() => setSuccess(''), 3000);
     }
   };
@@ -173,7 +173,7 @@ export default function AdminPage() {
             }`}
           >
             <Calendar className="w-5 h-5 inline mr-2" />
-            Subscriptions ({subscriptions.length})
+            Coffee Subscriptions ({subscriptions.length})
             {dueSubscriptions.length > 0 && (
               <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                 {dueSubscriptions.length}
@@ -320,24 +320,29 @@ export default function AdminPage() {
                     <div className="flex items-center gap-3 mb-4">
                       <Bell className="w-6 h-6 text-red-600" />
                       <h3 className="text-xl font-bold text-red-900">
-                        Overdue Subscriptions ({dueSubscriptions.length})
+                        Overdue Coffee Deliveries ({dueSubscriptions.length})
                       </h3>
                     </div>
                     <div className="space-y-3">
                       {dueSubscriptions.map((subscription) => (
                         <div key={subscription.id} className="bg-white rounded-lg p-4 flex items-center justify-between">
-                          <div>
+                          <div className="flex-1">
                             <p className="font-bold text-fg">{subscription.userName}</p>
                             <p className="text-sm text-secondary">{subscription.userEmail}</p>
                             <p className="text-sm text-red-600 font-semibold mt-1">
-                              Due: {formatDate(subscription.nextDueDate)} - ${subscription.amount} ({getFrequencyDisplay(subscription.frequency)})
+                              Due: {formatDate(subscription.nextDueDate)} - ${subscription.amount.toFixed(2)} ({getFrequencyDisplay(subscription.frequency)})
                             </p>
+                            {subscription.products && subscription.products.length > 0 && (
+                              <p className="text-xs text-secondary mt-1">
+                                {subscription.products.map(p => `${p.quantity}x ${p.name}`).join(', ')}
+                              </p>
+                            )}
                           </div>
                           <button
                             onClick={() => handleProcessPayment(subscription.id)}
-                            className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors"
+                            className="px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors whitespace-nowrap"
                           >
-                            Process Payment
+                            Process Delivery
                           </button>
                         </div>
                       ))}
@@ -351,22 +356,27 @@ export default function AdminPage() {
                     <div className="flex items-center gap-3 mb-4">
                       <Calendar className="w-6 h-6 text-yellow-600" />
                       <h3 className="text-xl font-bold text-yellow-900">
-                        Due Within 7 Days ({upcomingDueSubscriptions.length})
+                        Coffee Deliveries Due Within 7 Days ({upcomingDueSubscriptions.length})
                       </h3>
                     </div>
                     <div className="space-y-3">
                       {upcomingDueSubscriptions.map((subscription) => (
                         <div key={subscription.id} className="bg-white rounded-lg p-4 flex items-center justify-between">
-                          <div>
+                          <div className="flex-1">
                             <p className="font-bold text-fg">{subscription.userName}</p>
                             <p className="text-sm text-secondary">{subscription.userEmail}</p>
                             <p className="text-sm text-yellow-700 font-semibold mt-1">
-                              Due: {formatDate(subscription.nextDueDate)} - ${subscription.amount} ({getFrequencyDisplay(subscription.frequency)})
+                              Due: {formatDate(subscription.nextDueDate)} - ${subscription.amount.toFixed(2)} ({getFrequencyDisplay(subscription.frequency)})
                             </p>
+                            {subscription.products && subscription.products.length > 0 && (
+                              <p className="text-xs text-secondary mt-1">
+                                {subscription.products.map(p => `${p.quantity}x ${p.name}`).join(', ')}
+                              </p>
+                            )}
                           </div>
                           <button
                             onClick={() => handleProcessPayment(subscription.id)}
-                            className="px-4 py-2 bg-yellow-600 text-white font-semibold rounded-lg hover:bg-yellow-700 transition-colors"
+                            className="px-4 py-2 bg-yellow-600 text-white font-semibold rounded-lg hover:bg-yellow-700 transition-colors whitespace-nowrap"
                           >
                             Process Early
                           </button>
@@ -380,12 +390,12 @@ export default function AdminPage() {
 
             {/* All Subscriptions */}
             <div>
-              <h3 className="text-xl font-bold text-fg mb-4">All Subscriptions</h3>
+              <h3 className="text-xl font-bold text-fg mb-4">All Coffee Subscriptions</h3>
               {subscriptions.length === 0 ? (
                 <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-secondary/10">
                   <Calendar className="w-16 h-16 text-secondary/40 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-fg mb-2">No Subscriptions Yet</h3>
-                  <p className="text-secondary">Subscriptions will appear here once users start subscribing</p>
+                  <h3 className="text-xl font-bold text-fg mb-2">No Coffee Subscriptions Yet</h3>
+                  <p className="text-secondary">Coffee subscriptions will appear here once users start subscribing</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -408,10 +418,10 @@ export default function AdminPage() {
                           </div>
                           <div className="text-right">
                             <p className="text-2xl font-bold text-primary mb-2">
-                              ${subscription.amount}
+                              ${subscription.amount.toFixed(2)}
                             </p>
                             <p className="text-sm text-secondary mb-2">
-                              {getFrequencyDisplay(subscription.frequency)}
+                              {getFrequencyDisplay(subscription.frequency)} delivery
                             </p>
                             <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
                               subscription.status === 'active'
@@ -425,6 +435,25 @@ export default function AdminPage() {
                           </div>
                         </div>
 
+                        {/* Products in subscription */}
+                        {subscription.products && subscription.products.length > 0 && (
+                          <div className="mb-4 p-4 bg-bg rounded-lg">
+                            <p className="text-sm font-semibold text-fg mb-2">Coffee Products:</p>
+                            <div className="space-y-1">
+                              {subscription.products.map((product, idx) => (
+                                <div key={idx} className="flex items-center justify-between text-sm">
+                                  <span className="text-fg">
+                                    {product.quantity}x {product.name}
+                                  </span>
+                                  <span className="text-secondary">
+                                    ${(product.price * product.quantity).toFixed(2)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-bg rounded-lg">
                           <div>
                             <p className="text-sm font-semibold text-fg mb-1">Start Date</p>
@@ -432,7 +461,7 @@ export default function AdminPage() {
                           </div>
                           {subscription.status === 'active' && (
                             <div>
-                              <p className="text-sm font-semibold text-fg mb-1">Next Due</p>
+                              <p className="text-sm font-semibold text-fg mb-1">Next Delivery Due</p>
                               <p className={`text-sm font-semibold ${overdue ? 'text-red-600' : 'text-secondary'}`}>
                                 {formatDate(subscription.nextDueDate)}
                                 {overdue && ' (OVERDUE)'}
@@ -441,7 +470,7 @@ export default function AdminPage() {
                           )}
                           {subscription.lastPaymentDate && (
                             <div>
-                              <p className="text-sm font-semibold text-fg mb-1">Last Payment</p>
+                              <p className="text-sm font-semibold text-fg mb-1">Last Delivery</p>
                               <p className="text-sm text-secondary">{formatDate(subscription.lastPaymentDate)}</p>
                             </div>
                           )}
@@ -452,7 +481,7 @@ export default function AdminPage() {
                             onClick={() => handleProcessPayment(subscription.id)}
                             className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-accent transition-colors"
                           >
-                            Process Payment
+                            Process Delivery
                           </button>
                         )}
                       </div>

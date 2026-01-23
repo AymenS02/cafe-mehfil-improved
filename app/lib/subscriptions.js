@@ -23,19 +23,23 @@ export const getSubscriptionById = (subscriptionId) => {
 };
 
 // Create subscription
-export const createSubscription = (userId, userName, userEmail, amount, frequency) => {
+export const createSubscription = (userId, userName, userEmail, products, frequency) => {
   const subscriptions = getSubscriptions();
   
   const startDate = new Date();
   const nextDueDate = calculateNextDueDate(startDate, frequency);
+  
+  // Calculate total amount from products
+  const amount = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
   
   const newSubscription = {
     id: crypto.randomUUID(),
     userId,
     userName,
     userEmail,
+    products, // Array of {id, name, price, quantity, image}
     amount,
-    frequency, // monthly, quarterly, yearly
+    frequency, // weekly, biweekly, monthly
     status: 'active', // active, paused, cancelled
     startDate: startDate.toISOString(),
     nextDueDate: nextDueDate.toISOString(),
@@ -55,14 +59,14 @@ const calculateNextDueDate = (currentDate, frequency) => {
   const date = new Date(currentDate);
   
   switch (frequency) {
+    case 'weekly':
+      date.setDate(date.getDate() + 7);
+      break;
+    case 'biweekly':
+      date.setDate(date.getDate() + 14);
+      break;
     case 'monthly':
       date.setMonth(date.getMonth() + 1);
-      break;
-    case 'quarterly':
-      date.setMonth(date.getMonth() + 3);
-      break;
-    case 'yearly':
-      date.setFullYear(date.getFullYear() + 1);
       break;
     default:
       date.setMonth(date.getMonth() + 1);
@@ -146,9 +150,9 @@ export const getSubscriptionStatusDisplay = (status) => {
 // Get frequency display text
 export const getFrequencyDisplay = (frequency) => {
   const frequencyMap = {
-    monthly: 'Monthly',
-    quarterly: 'Quarterly',
-    yearly: 'Yearly'
+    weekly: 'Weekly',
+    biweekly: 'Every 2 Weeks',
+    monthly: 'Monthly'
   };
   return frequencyMap[frequency] || frequency;
 };
