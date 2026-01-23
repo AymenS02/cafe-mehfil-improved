@@ -13,8 +13,10 @@ import {
   getUpcomingDueSubscriptions,
   getFrequencyDisplay,
   getSubscriptionStatusDisplay,
+  getPaymentStatusDisplay,
   formatDate,
-  isSubscriptionOverdue
+  isSubscriptionOverdue,
+  updateSubscriptionPaymentStatus
 } from '../lib/subscriptions';
 import { Shield, Users, Package, UserPlus, Check, X, AlertCircle, Calendar, Bell } from 'lucide-react';
 
@@ -107,6 +109,18 @@ export default function AdminPage() {
       loadData();
       setSuccess(`Delivery processed for ${result.subscription.userName}'s coffee subscription`);
       setTimeout(() => setSuccess(''), 3000);
+    }
+  };
+
+  const handleConfirmPayment = (subscriptionId) => {
+    const result = updateSubscriptionPaymentStatus(subscriptionId, 'confirmed');
+    if (result.success) {
+      loadData();
+      setSuccess(`Payment confirmed and subscription activated`);
+      setTimeout(() => setSuccess(''), 5000);
+    } else {
+      setError(result.error || 'Failed to confirm payment');
+      setTimeout(() => setError(''), 5000);
     }
   };
 
@@ -423,15 +437,24 @@ export default function AdminPage() {
                             <p className="text-sm text-secondary mb-2">
                               {getFrequencyDisplay(subscription.frequency)} delivery
                             </p>
-                            <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
-                              subscription.status === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : subscription.status === 'paused'
-                                ? 'bg-yellow-100 text-yellow-800'
-                                : 'bg-gray-100 text-gray-800'
-                            }`}>
-                              {getSubscriptionStatusDisplay(subscription.status)}
-                            </span>
+                            <div className="flex flex-col gap-1 items-end">
+                              <span className={`px-3 py-1 text-xs font-semibold rounded-full ${
+                                subscription.status === 'active'
+                                  ? 'bg-green-100 text-green-800'
+                                  : subscription.status === 'paused'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : subscription.status === 'pending_payment'
+                                  ? 'bg-orange-100 text-orange-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {getSubscriptionStatusDisplay(subscription.status)}
+                              </span>
+                              {subscription.paymentMethod && (
+                                <span className="text-xs text-secondary">
+                                  {subscription.paymentMethod === 'paypal' ? 'PayPal' : 'E-Transfer'}
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -474,16 +497,41 @@ export default function AdminPage() {
                               <p className="text-sm text-secondary">{formatDate(subscription.lastPaymentDate)}</p>
                             </div>
                           )}
+                          {subscription.paymentStatus && (
+                            <div>
+                              <p className="text-sm font-semibold text-fg mb-1">Payment Status</p>
+                              <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${
+                                subscription.paymentStatus === 'confirmed'
+                                  ? 'bg-green-100 text-green-800'
+                                  : subscription.paymentStatus === 'awaiting_confirmation'
+                                  ? 'bg-yellow-100 text-yellow-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {getPaymentStatusDisplay(subscription.paymentStatus)}
+                              </span>
+                            </div>
+                          )}
                         </div>
 
-                        {subscription.status === 'active' && (
-                          <button
-                            onClick={() => handleProcessPayment(subscription.id)}
-                            className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-accent transition-colors"
-                          >
-                            Process Delivery
-                          </button>
-                        )}
+                        {/* Action Buttons */}
+                        <div className="flex flex-wrap gap-2">
+                          {subscription.status === 'pending_payment' && subscription.paymentMethod === 'etransfer' && (
+                            <button
+                              onClick={() => handleConfirmPayment(subscription.id)}
+                              className="px-6 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                            >
+                              Confirm Payment Received
+                            </button>
+                          )}
+                          {subscription.status === 'active' && (
+                            <button
+                              onClick={() => handleProcessPayment(subscription.id)}
+                              className="px-6 py-2 bg-primary text-white font-semibold rounded-lg hover:bg-accent transition-colors"
+                            >
+                              Process Delivery
+                            </button>
+                          )}
+                        </div>
                       </div>
                     );
                   })}

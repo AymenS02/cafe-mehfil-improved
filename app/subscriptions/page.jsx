@@ -189,9 +189,30 @@ export default function SubscriptionsPage() {
     if (result.success) {
       loadSubscriptions();
       setSuccess(`Subscription ${newStatus} successfully!`);
-      setTimeout(() => setSuccess(''), 3000);
+      setTimeout(() => setSuccess(''), 5000);
     } else {
       setError(result.error || 'Failed to update subscription');
+    }
+  };
+
+  const handleCancelSubscription = () => {
+    if (!subscriptionToCancel) return;
+
+    const result = updateSubscriptionStatus(
+      subscriptionToCancel.id, 
+      'cancelled', 
+      cancellationReason
+    );
+    
+    if (result.success) {
+      loadSubscriptions();
+      setSuccess('Subscription cancelled successfully');
+      setTimeout(() => setSuccess(''), 3000);
+      setShowCancelModal(false);
+      setSubscriptionToCancel(null);
+      setCancellationReason('');
+    } else {
+      setError(result.error || 'Failed to cancel subscription');
     }
   };
 
@@ -363,6 +384,58 @@ export default function SubscriptionsPage() {
                   </div>
                 </div>
 
+                {/* Payment Method Selection */}
+                <div>
+                  <label className="block text-sm font-semibold text-fg mb-3">
+                    Payment Method
+                  </label>
+                  <div className="space-y-2">
+                    {/* PayPal Option */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('paypal')}
+                      className={`w-full py-3 px-4 rounded-lg border-2 text-left transition-all ${
+                        paymentMethod === 'paypal'
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-secondary/30 text-fg hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="w-5 h-5" />
+                          <span className="font-semibold">PayPal</span>
+                        </div>
+                        {paymentMethod === 'paypal' && (
+                          <Check className="w-5 h-5" />
+                        )}
+                      </div>
+                      <p className="text-xs text-secondary mt-1 ml-7">Secure payment via PayPal</p>
+                    </button>
+
+                    {/* E-Transfer Option */}
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('etransfer')}
+                      className={`w-full py-3 px-4 rounded-lg border-2 text-left transition-all ${
+                        paymentMethod === 'etransfer'
+                          ? 'border-primary bg-primary/10 text-primary'
+                          : 'border-secondary/30 text-fg hover:border-primary/50'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Building2 className="w-5 h-5" />
+                          <span className="font-semibold">E-Transfer</span>
+                        </div>
+                        {paymentMethod === 'etransfer' && (
+                          <Check className="w-5 h-5" />
+                        )}
+                      </div>
+                      <p className="text-xs text-secondary mt-1 ml-7">Send to: cafemehfilcoffee@gmail.com</p>
+                    </button>
+                  </div>
+                </div>
+
                 {/* Summary */}
                 {selectedProducts.length > 0 && (
                   <div className="bg-bg p-4 rounded-lg border border-secondary/30">
@@ -379,7 +452,7 @@ export default function SubscriptionsPage() {
                 {/* Submit Button */}
                 <button
                   type="submit"
-                  disabled={isSubmitting || selectedProducts.length === 0}
+                  disabled={isSubmitting || selectedProducts.length === 0 || !paymentMethod}
                   className="w-full bg-primary text-white py-3 px-6 rounded-lg font-semibold hover:bg-accent transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Creating...' : 'Start Subscription'}
@@ -472,7 +545,10 @@ export default function SubscriptionsPage() {
                           Pause
                         </button>
                         <button
-                          onClick={() => handleUpdateStatus(subscription.id, 'cancelled')}
+                          onClick={() => {
+                            setSubscriptionToCancel(subscription);
+                            setShowCancelModal(true);
+                          }}
                           className="flex-1 py-2 px-3 bg-red-100 text-red-800 rounded-lg text-sm font-semibold hover:bg-red-200 transition-colors"
                         >
                           Cancel
@@ -494,6 +570,75 @@ export default function SubscriptionsPage() {
             </div>
           )}
         </div>
+
+        {/* Cancellation Modal */}
+        {showCancelModal && subscriptionToCancel && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-2xl font-bold text-fg">Cancel Subscription</h3>
+                <button
+                  onClick={() => {
+                    setShowCancelModal(false);
+                    setSubscriptionToCancel(null);
+                    setCancellationReason('');
+                  }}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-secondary/10 transition-colors"
+                >
+                  <X className="w-5 h-5 text-secondary" />
+                </button>
+              </div>
+
+              <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-800 text-sm font-semibold mb-2">
+                  Are you sure you want to cancel this subscription?
+                </p>
+                <div className="text-sm text-red-700">
+                  <p className="mb-1">
+                    <span className="font-semibold">Amount:</span> ${subscriptionToCancel.amount.toFixed(2)} {getFrequencyDisplay(subscriptionToCancel.frequency)}
+                  </p>
+                  {subscriptionToCancel.products && subscriptionToCancel.products.length > 0 && (
+                    <p>
+                      <span className="font-semibold">Products:</span> {subscriptionToCancel.products.map(p => `${p.quantity}x ${p.name}`).join(', ')}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-fg mb-2">
+                  Reason for cancellation (optional)
+                </label>
+                <textarea
+                  value={cancellationReason}
+                  onChange={(e) => setCancellationReason(e.target.value)}
+                  placeholder="Help us improve by letting us know why you're cancelling..."
+                  className="w-full px-4 py-3 rounded-lg border border-secondary/30 bg-bg focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition text-fg resize-none"
+                  rows={4}
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowCancelModal(false);
+                    setSubscriptionToCancel(null);
+                    setCancellationReason('');
+                  }}
+                  className="flex-1 py-3 px-4 bg-secondary/20 text-fg rounded-lg font-semibold hover:bg-secondary/30 transition-colors"
+                >
+                  Keep Subscription
+                </button>
+                <button
+                  onClick={handleCancelSubscription}
+                  className="flex-1 py-3 px-4 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                >
+                  Cancel Subscription
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
