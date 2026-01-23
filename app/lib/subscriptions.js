@@ -22,8 +22,8 @@ export const getSubscriptionById = (subscriptionId) => {
   return subscriptions.find(subscription => subscription.id === subscriptionId);
 };
 
-// Create subscription
-export const createSubscription = (userId, userName, userEmail, products, frequency) => {
+// Create subscription with payment
+export const createSubscription = (userId, userName, userEmail, products, frequency, paymentMethod) => {
   const subscriptions = getSubscriptions();
   
   const startDate = new Date();
@@ -40,7 +40,9 @@ export const createSubscription = (userId, userName, userEmail, products, freque
     products, // Array of {id, name, price, quantity, image}
     amount,
     frequency, // weekly, biweekly, monthly
-    status: 'active', // active, paused, cancelled
+    paymentMethod, // paypal, etransfer
+    paymentStatus: paymentMethod === 'etransfer' ? 'awaiting_confirmation' : 'pending', // pending, awaiting_confirmation, confirmed, failed
+    status: paymentMethod === 'etransfer' ? 'pending_payment' : 'active', // pending_payment, active, paused, cancelled
     startDate: startDate.toISOString(),
     nextDueDate: nextDueDate.toISOString(),
     lastPaymentDate: null,
@@ -76,7 +78,7 @@ const calculateNextDueDate = (currentDate, frequency) => {
 };
 
 // Update subscription status
-export const updateSubscriptionStatus = (subscriptionId, status) => {
+export const updateSubscriptionStatus = (subscriptionId, status, cancellationReason = null) => {
   const subscriptions = getSubscriptions();
   const subscriptionIndex = subscriptions.findIndex(subscription => subscription.id === subscriptionId);
   
@@ -86,6 +88,36 @@ export const updateSubscriptionStatus = (subscriptionId, status) => {
   
   subscriptions[subscriptionIndex].status = status;
   subscriptions[subscriptionIndex].updatedAt = new Date().toISOString();
+  
+  // Store cancellation reason and date if cancelling
+  if (status === 'cancelled') {
+    subscriptions[subscriptionIndex].cancelledAt = new Date().toISOString();
+    subscriptions[subscriptionIndex].cancellationReason = cancellationReason;
+  }
+  
+  localStorage.setItem(SUBSCRIPTIONS_KEY, JSON.stringify(subscriptions));
+  
+  return { success: true, subscription: subscriptions[subscriptionIndex] };
+};
+
+// Update payment status for subscription
+export const updateSubscriptionPaymentStatus = (subscriptionId, paymentStatus) => {
+  const subscriptions = getSubscriptions();
+  const subscriptionIndex = subscriptions.findIndex(subscription => subscription.id === subscriptionId);
+  
+  if (subscriptionIndex === -1) {
+    return { success: false, error: 'Subscription not found' };
+  }
+  
+  subscriptions[subscriptionIndex].paymentStatus = paymentStatus;
+  subscriptions[subscriptionIndex].updatedAt = new Date().toISOString();
+  
+  // Activate subscription if payment is confirmed and status is pending_payment
+  if (paymentStatus === 'confirmed' && subscriptions[subscriptionIndex].status === 'pending_payment') {
+    subscriptions[subscriptionIndex].status = 'active';
+    subscriptions[subscriptionIndex].lastPaymentDate = new Date().toISOString();
+  }
+  
   localStorage.setItem(SUBSCRIPTIONS_KEY, JSON.stringify(subscriptions));
   
   return { success: true, subscription: subscriptions[subscriptionIndex] };
@@ -140,9 +172,21 @@ export const getUpcomingDueSubscriptions = () => {
 // Get subscription status display text
 export const getSubscriptionStatusDisplay = (status) => {
   const statusMap = {
+    pending_payment: 'Pending Payment',
     active: 'Active',
     paused: 'Paused',
     cancelled: 'Cancelled'
+  };
+  return statusMap[status] || status;
+};
+
+// Get payment status display text
+export const getPaymentStatusDisplay = (status) => {
+  const statusMap = {
+    pending: 'Pending',
+    awaiting_confirmation: 'Awaiting Confirmation',
+    confirmed: 'Confirmed',
+    failed: 'Failed'
   };
   return statusMap[status] || status;
 };

@@ -13,7 +13,7 @@ import {
   formatDate,
   isSubscriptionOverdue
 } from '../lib/subscriptions';
-import { Check, Calendar, DollarSign, Clock, AlertCircle, Plus, Minus, Package, Coffee, Trash2 } from 'lucide-react';
+import { Check, Calendar, DollarSign, Clock, AlertCircle, Plus, Minus, Package, Coffee, Trash2, CreditCard, Building2, X } from 'lucide-react';
 
 // Available coffee products for subscription
 const COFFEE_PRODUCTS = [
@@ -72,10 +72,14 @@ export default function SubscriptionsPage() {
   const { user, isAuthenticated } = useAuth();
   const [selectedProducts, setSelectedProducts] = useState([]);
   const [selectedFrequency, setSelectedFrequency] = useState('monthly');
+  const [paymentMethod, setPaymentMethod] = useState('');
   const [mySubscriptions, setMySubscriptions] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [subscriptionToCancel, setSubscriptionToCancel] = useState(null);
+  const [cancellationReason, setCancellationReason] = useState('');
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -139,6 +143,11 @@ export default function SubscriptionsPage() {
       return;
     }
 
+    if (!paymentMethod) {
+      setError('Please select a payment method');
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
     setSuccess('');
@@ -149,17 +158,22 @@ export default function SubscriptionsPage() {
         user.name,
         user.email,
         selectedProducts,
-        selectedFrequency
+        selectedFrequency,
+        paymentMethod
       );
 
       if (result.success) {
-        setSuccess('Coffee subscription created successfully!');
+        const paymentMessage = paymentMethod === 'etransfer' 
+          ? 'Coffee subscription created! Please send payment to cafemehfilcoffee@gmail.com to activate.'
+          : 'Coffee subscription created successfully!';
+        setSuccess(paymentMessage);
         setSelectedProducts([]);
         setSelectedFrequency('monthly');
+        setPaymentMethod('');
         loadSubscriptions();
         
-        // Clear success message after 3 seconds
-        setTimeout(() => setSuccess(''), 3000);
+        // Clear success message after 5 seconds
+        setTimeout(() => setSuccess(''), 5000);
       } else {
         setError(result.error || 'Failed to create subscription');
       }
