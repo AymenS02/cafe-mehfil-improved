@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -40,18 +40,18 @@ export default function SubscriptionsPage() {
   }, [isAuthenticated, router]);
 
   // Load user's subscriptions
-  useEffect(() => {
-    if (isAuthenticated && user) {
-      loadSubscriptions();
-    }
-  }, [isAuthenticated, user]);
-
-  const loadSubscriptions = () => {
+  const loadSubscriptions = useCallback(() => {
     if (user) {
       const subscriptions = getUserSubscriptions(user.id);
       setMySubscriptions(subscriptions);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      loadSubscriptions();
+    }
+  }, [isAuthenticated, user, loadSubscriptions]);
 
   if (!isAuthenticated || !user) {
     return null;

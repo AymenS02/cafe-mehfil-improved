@@ -37,6 +37,17 @@ export default function AdminPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  const loadData = () => {
+    const allOrders = getOrders();
+    setOrders(allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    setUsers(getUsers());
+    
+    const allSubscriptions = getSubscriptions();
+    setSubscriptions(allSubscriptions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+    setDueSubscriptions(getDueSubscriptions());
+    setUpcomingDueSubscriptions(getUpcomingDueSubscriptions());
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       router.push('/login?redirect=/admin');
@@ -50,17 +61,6 @@ export default function AdminPage() {
 
     loadData();
   }, [isAuthenticated, isAdmin, router]);
-
-  const loadData = () => {
-    const allOrders = getOrders();
-    setOrders(allOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-    setUsers(getUsers());
-    
-    const allSubscriptions = getSubscriptions();
-    setSubscriptions(allSubscriptions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
-    setDueSubscriptions(getDueSubscriptions());
-    setUpcomingDueSubscriptions(getUpcomingDueSubscriptions());
-  };
 
   if (!isAuthenticated || !isAdmin) {
     return null;
@@ -105,7 +105,7 @@ export default function AdminPage() {
     const result = processSubscriptionPayment(subscriptionId);
     if (result.success) {
       loadData();
-      setSuccess(`Payment processed for subscription #${subscriptionId}`);
+      setSuccess(`Payment processed for ${result.subscription.userName}'s subscription`);
       setTimeout(() => setSuccess(''), 3000);
     }
   };
