@@ -13,7 +13,6 @@ import {
   getUpcomingDueSubscriptions,
   getFrequencyDisplay,
   getSubscriptionStatusDisplay,
-  getPaymentStatusDisplay,
   formatDate,
   isSubscriptionOverdue,
   updateSubscriptionPaymentStatus
