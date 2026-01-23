@@ -189,7 +189,7 @@ export default function SubscriptionsPage() {
     if (result.success) {
       loadSubscriptions();
       setSuccess(`Subscription ${newStatus} successfully!`);
-      setTimeout(() => setSuccess(''), 3000);
+      setTimeout(() => setSuccess(''), 5000);
     } else {
       setError(result.error || 'Failed to update subscription');
     }

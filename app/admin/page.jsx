@@ -117,10 +117,10 @@ export default function AdminPage() {
     if (result.success) {
       loadData();
       setSuccess(`Payment confirmed and subscription activated`);
-      setTimeout(() => setSuccess(''), 3000);
+      setTimeout(() => setSuccess(''), 5000);
     } else {
       setError(result.error || 'Failed to confirm payment');
-      setTimeout(() => setError(''), 3000);
+      setTimeout(() => setError(''), 5000);
     }
   };
 
